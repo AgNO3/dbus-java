@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.agno3</groupId>
+		<artifactId>java-dbus-apps</artifactId>
+		<version>3.5</version>
+	</parent>
+	<artifactId>java-dbus-app-viewer</artifactId>
+	<name>Java DBUS Viewer App</name>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.freedesktop.dbus.bin.viewer.DBusViewer</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jar-with-deps</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>eu.agno3</groupId>
+			<artifactId>java-dbus-app-createinterface</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
