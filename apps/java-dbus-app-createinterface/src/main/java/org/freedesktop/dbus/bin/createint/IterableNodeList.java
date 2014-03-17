@@ -7,23 +7,28 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.bin;
+ */
+package org.freedesktop.dbus.bin.createint;
+
 
 import java.util.Iterator;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class IterableNodeList implements Iterable<Node>
-{
-   private NodeList nl;
-   public IterableNodeList(NodeList nl)
-   {
-      this.nl = nl;
-   }
-   public Iterator<Node> iterator()
-   {
-      return new NodeListIterator(nl);
-   }
+
+class IterableNodeList implements Iterable<Node> {
+
+    private NodeList nl;
+
+
+    public IterableNodeList ( NodeList nl ) {
+        this.nl = nl;
+    }
+
+
+    @Override
+    public Iterator<Node> iterator () {
+        return new NodeListIterator(this.nl);
+    }
 }

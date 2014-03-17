@@ -7,37 +7,37 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.bin;
+ */
+package org.freedesktop.dbus.bin.createint;
+
 
 import java.util.Arrays;
+
 
 /**
  * Checks identifiers for keywords etc and mangles them if so.
  */
-public class IdentifierMangler
-{
-   private static String[] keywords;
-   static {
-      keywords = new String[] {
-         "true","false","null",
-         "abstract","continue","for","new","switch",
-         "assert","default","goto","package","synchronized",
-         "boolean","do","if","private","this",
-         "break","double","implements","protected","throw",
-         "byte","else","import","public","throws",
-         "case","enum","instanceof","return","transient",
-         "catch","extends","int","short","try",
-         "char","final","interface","static","void",
-         "class","finally","long","strictfp","volatile",
-         "const","float","native","super","while"
-      };
-      Arrays.sort(keywords);
-   }
-   public static String mangle(String name)
-   {
-      if (Arrays.binarySearch(keywords, name) >= 0)
-         name = "_"+name;
-      return name;
-   }
+@SuppressWarnings ( {
+    "nls", "javadoc"
+} )
+public class IdentifierMangler {
+
+    private static String[] keywords;
+    static {
+        keywords = new String[] {
+            "true", "false", "null", "abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized",
+            "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public",
+            "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface",
+            "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"
+        };
+        Arrays.sort(keywords);
+    }
+
+
+    public static String mangle ( String name ) {
+        String tmpName = name;
+        if ( Arrays.binarySearch(keywords, tmpName) >= 0 )
+            tmpName = "_" + tmpName;
+        return tmpName;
+    }
 }

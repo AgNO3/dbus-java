@@ -7,24 +7,26 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.test;
+ */
+package org.freedesktop.dbus.test.data;
 
-import org.freedesktop.dbus.Position;
-import org.freedesktop.dbus.Struct;
-import org.freedesktop.dbus.exceptions.DBusException;
 
 import java.util.List;
 
-public final class TestStruct3 extends Struct
-{
-   @Position(0)
-   public final TestStruct2 a;
-   @Position(1)
-   public final List<List<Integer>> b;
-   public TestStruct3(TestStruct2 a, List<List<Integer>> b) throws DBusException
-   {
-      this.a = a;
-      this.b = b;
-   }
+import org.freedesktop.dbus.Position;
+import org.freedesktop.dbus.types.Struct;
+
+
+public final class TestStruct3 extends Struct {
+
+    @Position ( 0 )
+    public final TestStruct2 a;
+    @Position ( 1 )
+    public final List<List<Integer>> b;
+
+
+    public TestStruct3 ( TestStruct2 a, List<List<Integer>> b ) {
+        this.a = a;
+        this.b = b;
+    }
 }

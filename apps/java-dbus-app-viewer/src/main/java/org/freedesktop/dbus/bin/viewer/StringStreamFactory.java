@@ -7,8 +7,9 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.viewer;
+ */
+package org.freedesktop.dbus.bin.viewer;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,7 +17,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.freedesktop.dbus.bin.CreateInterface.PrintStreamFactory;
+import org.freedesktop.dbus.bin.createint.CreateInterface.PrintStreamFactory;
+
 
 /**
  * A factory using a byte array input stream
@@ -25,23 +27,24 @@ import org.freedesktop.dbus.bin.CreateInterface.PrintStreamFactory;
  * @author pete
  * @since 10/02/2006
  */
-final class StringStreamFactory extends PrintStreamFactory
-{
-	Map<String, ByteArrayOutputStream> streamMap = new HashMap<String, ByteArrayOutputStream>();
+final class StringStreamFactory extends PrintStreamFactory {
 
-	/** {@inheritDoc} */
-	public void init(String file, String path)
-	{
+    Map<String, ByteArrayOutputStream> streamMap = new HashMap<>();
 
-	}
 
-	/** {@inheritDoc} */
-	@SuppressWarnings("unused")
-	public PrintStream createPrintStream(final String file) throws IOException
-	{
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		streamMap.put(file, stream);
-		return new PrintStream(stream);
+    /** {@inheritDoc} */
+    @Override
+    public void init ( String file, String path ) {
 
-	}
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public PrintStream createPrintStream ( final String file ) throws IOException {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        this.streamMap.put(file, stream);
+        return new PrintStream(stream);
+
+    }
 }

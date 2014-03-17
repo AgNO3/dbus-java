@@ -7,16 +7,17 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
+
 
 import java.io.IOException;
 
-@SuppressWarnings("serial")
-public class MessageTypeException extends IOException implements NonFatalException
-{
-   public MessageTypeException(String message)
-   {
-      super(message);
-   }
+
+@SuppressWarnings ( "serial" )
+public class MessageTypeException extends IOException implements NonFatalException {
+
+    public MessageTypeException ( String message ) {
+        super(message);
+    }
 }

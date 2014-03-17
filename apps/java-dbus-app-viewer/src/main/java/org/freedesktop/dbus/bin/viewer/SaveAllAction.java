@@ -7,56 +7,67 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.viewer;
+ */
+package org.freedesktop.dbus.bin.viewer;
+
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import javax.swing.JTabbedPane;
 
-@SuppressWarnings("serial")
-class SaveAllAction extends TabbedSaveAction
-{
 
-	private class TabIterator implements Iterator<TextFile>
-	{
-		private int i = 0;
-		/** {@inheritDoc} */
-		public boolean hasNext()
-		{
-			return i < tabbedPane.getTabCount();
-		}
+@SuppressWarnings ( "serial" )
+class SaveAllAction extends TabbedSaveAction {
 
-		/** {@inheritDoc} */
-		public TextFile next()
-		{
-			if (hasNext())
-			{
-				int currentIndex = i;
-				i++;
-				return getTextFile(currentIndex);
-			}
-			throw new NoSuchElementException();
-		}
+    private class TabIterator implements Iterator<TextFile> {
 
-		/** {@inheritDoc} */
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
+        private int i = 0;
 
-	}
 
-	protected SaveAllAction(JTabbedPane tabbedPane)
-	{
-		super(tabbedPane, "Save All...");
-	}
+        /**
+         * 
+         */
+        public TabIterator () {}
 
-	/** {@inheritDoc} */
-	public Iterator<TextFile> iterator()
-	{
-		return new TabIterator();
-	}
-	
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasNext () {
+            return this.i < SaveAllAction.this.tabbedPane.getTabCount();
+        }
+
+
+        /** {@inheritDoc} */
+        @Override
+        public TextFile next () {
+            if ( hasNext() ) {
+                int currentIndex = this.i;
+                this.i++;
+                return getTextFile(currentIndex);
+            }
+            throw new NoSuchElementException();
+        }
+
+
+        /** {@inheritDoc} */
+        @Override
+        public void remove () {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
+
+    protected SaveAllAction ( JTabbedPane tabbedPane ) {
+        super(tabbedPane, "Save All...");
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterator<TextFile> iterator () {
+        return new TabIterator();
+    }
+
 }

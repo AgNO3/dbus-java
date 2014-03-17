@@ -7,20 +7,20 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
+
 
 /**
  * An exception within DBus.
  */
-@SuppressWarnings("serial")
-public class DBusException extends Exception
-{
-   /**
-    * Create an exception with the specified message
-    */
-   public DBusException(String message)
-   {
-      super(message);
-   }
+@SuppressWarnings ( "serial" )
+public class DBusException extends Exception {
+
+    /**
+     * Create an exception with the specified message
+     */
+    public DBusException ( String message ) {
+        super(message);
+    }
 }

@@ -7,120 +7,186 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus;
 
-import static org.freedesktop.dbus.Gettext._;
 
 import java.util.Vector;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.log4j.Logger;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.freedesktop.dbus.exceptions.MessageFormatException;
-import cx.ath.matthew.debug.Debug;
-import cx.ath.matthew.utils.Hexdump;
 
-public class MethodCall extends Message
-{
-   MethodCall() { }
-   public MethodCall(String dest, String path, String iface, String member, byte flags, String sig, Object... args) throws DBusException
-   {
-      this(null, dest, path, iface, member, flags, sig, args);
-   }
-   public MethodCall(String source, String dest, String path, String iface, String member, byte flags, String sig, Object... args) throws DBusException
-   {
-      super(Message.Endian.BIG, Message.MessageType.METHOD_CALL, flags);
 
-      if (null == member || null == path)
-         throw new MessageFormatException(_("Must specify destination, path and function name to MethodCalls."));
-      headers.put(Message.HeaderField.PATH,path);
-      headers.put(Message.HeaderField.MEMBER,member);
+public class MethodCall extends Message {
 
-      Vector<Object> hargs = new Vector<Object>();
+    private static final Logger log = Logger.getLogger(MethodCall.class);
 
-      hargs.add(new Object[] { Message.HeaderField.PATH, new Object[] { ArgumentType.OBJECT_PATH_STRING, path } });
-      
-      if (null != source) {
-         headers.put(Message.HeaderField.SENDER,source);
-         hargs.add(new Object[] { Message.HeaderField.SENDER, new Object[] { ArgumentType.STRING_STRING, source } });
-      }
-      
-      if (null != dest) {
-         headers.put(Message.HeaderField.DESTINATION,dest);
-         hargs.add(new Object[] { Message.HeaderField.DESTINATION, new Object[] { ArgumentType.STRING_STRING, dest } });
-      }
-      
-      if (null != iface) {
-         hargs.add(new Object[] { Message.HeaderField.INTERFACE, new Object[] { ArgumentType.STRING_STRING, iface } });
-         headers.put(Message.HeaderField.INTERFACE,iface);
-      }
-      
-      hargs.add(new Object[] { Message.HeaderField.MEMBER, new Object[] { ArgumentType. STRING_STRING, member } });
 
-      if (null != sig) {
-         if (Debug.debug) Debug.print(Debug.DEBUG, "Appending arguments with signature: "+sig);
-         hargs.add(new Object[] { Message.HeaderField.SIGNATURE, new Object[] { ArgumentType.SIGNATURE_STRING, sig } });
-         headers.put(Message.HeaderField.SIGNATURE,sig);
-         setArgs(args);
-      }
+    MethodCall () {}
 
-      byte[] blen = new byte[4];
-      appendBytes(blen);
-      append("ua(yv)", serial, hargs.toArray());
-      pad((byte)8);
 
-      long c = bytecounter;
-      if (null != sig) append(sig, args);
-      if (Debug.debug) Debug.print(Debug.DEBUG, "Appended body, type: "+sig+" start: "+c+" end: "+bytecounter+" size: "+(bytecounter-c));
-      marshallint(bytecounter-c, blen, 0, 4);
-      if (Debug.debug) Debug.print("marshalled size ("+blen+"): "+Hexdump.format(blen));
-   }
-   private static long REPLY_WAIT_TIMEOUT = 20000;
-   /**
-    * Set the default timeout for method calls.
-    * Default is 20s.
-    * @param timeout New timeout in ms.
-    */
-   public static void setDefaultTimeout(long timeout)
-   {
-      REPLY_WAIT_TIMEOUT = timeout;
-   }
-   Message reply = null;
-   public synchronized boolean hasReply()
-   {
-      return null != reply;
-   }
-   /**
-    * Block (if neccessary) for a reply.
-    * @return The reply to this MethodCall, or null if a timeout happens.
-    * @param timeout The length of time to block before timing out (ms).
-    */
-   public synchronized Message getReply(long timeout)
-   {
-      if (Debug.debug) Debug.print(Debug.VERBOSE, "Blocking on "+this);
-      if (null != reply) return reply;
-      try {
-         wait(timeout);
-         return reply;
-      } catch (InterruptedException Ie) { return reply; }
-   }
-   /**
-    * Block (if neccessary) for a reply.
-    * Default timeout is 20s, or can be configured with setDefaultTimeout()
-    * @return The reply to this MethodCall, or null if a timeout happens.
-    */
-   public synchronized Message getReply()
-   {
-      if (Debug.debug) Debug.print(Debug.VERBOSE, "Blocking on "+this);
-      if (null != reply) return reply;
-      try {
-         wait(REPLY_WAIT_TIMEOUT);
-         return reply;
-      } catch (InterruptedException Ie) { return reply; }
-   }
-   protected synchronized void setReply(Message reply)
-   {
-      if (Debug.debug) Debug.print(Debug.VERBOSE, "Setting reply to "+this+" to "+reply);
-      this.reply = reply;
-      notifyAll();
-   }
+    public MethodCall ( String dest, String path, String iface, String member, byte flags, String sig, Object... args ) throws DBusException {
+        this(null, dest, path, iface, member, flags, sig, args);
+    }
+
+
+    public MethodCall ( String source, String dest, String path, String iface, String member, byte flags, String sig, Object... args )
+            throws DBusException {
+        super(Message.Endian.BIG, Message.MessageType.METHOD_CALL, flags);
+
+        if ( null == member || null == path )
+            throw new MessageFormatException("Must specify destination, path and function name to MethodCalls.");
+        this.headers.put(Message.HeaderField.PATH, path);
+        this.headers.put(Message.HeaderField.MEMBER, member);
+
+        Vector<Object> hargs = new Vector<>();
+
+        hargs.add(new Object[] {
+            Message.HeaderField.PATH, new Object[] {
+                ArgumentType.OBJECT_PATH_STRING, path
+            }
+        });
+
+        if ( null != source ) {
+            this.headers.put(Message.HeaderField.SENDER, source);
+            hargs.add(new Object[] {
+                Message.HeaderField.SENDER, new Object[] {
+                    ArgumentType.STRING_STRING, source
+                }
+            });
+        }
+
+        if ( null != dest ) {
+            this.headers.put(Message.HeaderField.DESTINATION, dest);
+            hargs.add(new Object[] {
+                Message.HeaderField.DESTINATION, new Object[] {
+                    ArgumentType.STRING_STRING, dest
+                }
+            });
+        }
+
+        if ( null != iface ) {
+            hargs.add(new Object[] {
+                Message.HeaderField.INTERFACE, new Object[] {
+                    ArgumentType.STRING_STRING, iface
+                }
+            });
+            this.headers.put(Message.HeaderField.INTERFACE, iface);
+        }
+
+        hargs.add(new Object[] {
+            Message.HeaderField.MEMBER, new Object[] {
+                ArgumentType.STRING_STRING, member
+            }
+        });
+
+        if ( null != sig ) {
+            if ( log.isDebugEnabled() ) {
+                log.debug("Appending arguments with signature: " + sig);
+            }
+            hargs.add(new Object[] {
+                Message.HeaderField.SIGNATURE, new Object[] {
+                    ArgumentType.SIGNATURE_STRING, sig
+                }
+            });
+            this.headers.put(Message.HeaderField.SIGNATURE, sig);
+            setArgs(args);
+        }
+
+        byte[] blen = new byte[4];
+        appendBytes(blen);
+        append("ua(yv)", this.serial, hargs.toArray());
+        pad((byte) 8);
+
+        long c = this.bytecounter;
+        if ( null != sig )
+            append(sig, args);
+
+        if ( log.isDebugEnabled() ) {
+            log.debug("Appended body, type: " + sig + " start: " + c + " end: " + this.bytecounter + " size: " + ( this.bytecounter - c ));
+        }
+        marshallint(this.bytecounter - c, blen, 0, 4);
+        if ( log.isDebugEnabled() ) {
+            Hex h = new Hex();
+            log.debug("marshalled size (" + blen + "): " + h.encode(blen));
+        }
+    }
+
+    private static long REPLY_WAIT_TIMEOUT = 20000;
+
+
+    /**
+     * Set the default timeout for method calls.
+     * Default is 20s.
+     * 
+     * @param timeout
+     *            New timeout in ms.
+     */
+    public static void setDefaultTimeout ( long timeout ) {
+        REPLY_WAIT_TIMEOUT = timeout;
+    }
+
+    Message reply = null;
+
+
+    public synchronized boolean hasReply () {
+        return null != this.reply;
+    }
+
+
+    /**
+     * Block (if neccessary) for a reply.
+     * 
+     * @return The reply to this MethodCall, or null if a timeout happens.
+     * @param timeout
+     *            The length of time to block before timing out (ms).
+     */
+    public synchronized Message getReply ( long timeout ) {
+        if ( log.isTraceEnabled() ) {
+            log.trace("Blocking on " + this);
+        }
+        if ( null != this.reply )
+            return this.reply;
+        try {
+            wait(timeout);
+            return this.reply;
+        }
+        catch ( InterruptedException Ie ) {
+            return this.reply;
+        }
+    }
+
+
+    /**
+     * Block (if neccessary) for a reply.
+     * Default timeout is 20s, or can be configured with setDefaultTimeout()
+     * 
+     * @return The reply to this MethodCall, or null if a timeout happens.
+     */
+    public synchronized Message getReply () {
+        if ( log.isTraceEnabled() ) {
+            log.trace("Blocking on " + this);
+        }
+        if ( null != this.reply )
+            return this.reply;
+        try {
+            wait(REPLY_WAIT_TIMEOUT);
+            return this.reply;
+        }
+        catch ( InterruptedException Ie ) {
+            return this.reply;
+        }
+    }
+
+
+    protected synchronized void setReply ( Message reply ) {
+        if ( log.isTraceEnabled() ) {
+            log.trace("Setting reply to " + this + " to " + reply);
+        }
+        this.reply = reply;
+        notifyAll();
+    }
 
 }

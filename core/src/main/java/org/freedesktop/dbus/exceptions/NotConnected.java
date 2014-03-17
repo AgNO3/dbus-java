@@ -7,17 +7,17 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
+
 
 /**
  * Thrown if a DBus action is called when not connected to the Bus.
  */
-@SuppressWarnings("serial")
-public class NotConnected extends DBusExecutionException implements FatalException
-{
-   public NotConnected(String message)
-   {
-      super (message);
-   }
+@SuppressWarnings ( "serial" )
+public class NotConnected extends DBusExecutionException implements FatalException {
+
+    public NotConnected ( String message ) {
+        super(message);
+    }
 }

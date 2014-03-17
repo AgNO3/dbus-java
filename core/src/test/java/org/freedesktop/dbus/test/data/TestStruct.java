@@ -7,26 +7,29 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.test;
+ */
+package org.freedesktop.dbus.test.data;
+
 
 import org.freedesktop.dbus.Position;
-import org.freedesktop.dbus.Struct;
-import org.freedesktop.dbus.UInt32;
-import org.freedesktop.dbus.Variant;
+import org.freedesktop.dbus.types.Struct;
+import org.freedesktop.dbus.types.UInt32;
+import org.freedesktop.dbus.types.Variant;
 
-public final class TestStruct extends Struct
-{
-   @Position(0)
-   public final String a;
-   @Position(1)
-   public final UInt32 b;
-   @Position(2)
-   public final Variant<? extends Object> c;
-   public TestStruct(String a, UInt32 b, Variant<? extends Object> c)
-   {
-      this.a = a;
-      this.b = b;
-      this.c = c;
-   }
+
+public final class TestStruct extends Struct {
+
+    @Position ( 0 )
+    public final String a;
+    @Position ( 1 )
+    public final UInt32 b;
+    @Position ( 2 )
+    public final Variant<? extends Object> c;
+
+
+    public TestStruct ( String a, UInt32 b, Variant<? extends Object> c ) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
 }

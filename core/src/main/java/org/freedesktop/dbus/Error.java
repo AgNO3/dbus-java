@@ -7,136 +7,175 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus;
 
-import static org.freedesktop.dbus.Gettext._;
 
 import java.lang.reflect.Constructor;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.freedesktop.dbus.exceptions.DBusExecutionException;
 import org.freedesktop.dbus.exceptions.MessageFormatException;
 import org.freedesktop.dbus.exceptions.NotConnected;
 
-import cx.ath.matthew.debug.Debug;
 
 /**
  * Error messages which can be sent over the bus.
  */
-public class Error extends Message
-{
-   Error() { }
-   public Error(String dest, String errorName, long replyserial, String sig, Object... args) throws DBusException
-   {
-      this(null, dest, errorName, replyserial, sig, args);
-   }
-   public Error(String source, String dest, String errorName, long replyserial, String sig, Object... args) throws DBusException
-   {
-      super(Message.Endian.BIG, Message.MessageType.ERROR, (byte) 0);
+public class Error extends Message {
 
-      if (null == errorName)
-         throw new MessageFormatException(_("Must specify error name to Errors."));
-      headers.put(Message.HeaderField.REPLY_SERIAL,replyserial);
-      headers.put(Message.HeaderField.ERROR_NAME,errorName);
-      
-      Vector<Object> hargs = new Vector<Object>();
-      hargs.add(new Object[] { Message.HeaderField.ERROR_NAME, new Object[] { ArgumentType.STRING_STRING, errorName } });
-      hargs.add(new Object[] { Message.HeaderField.REPLY_SERIAL, new Object[] { ArgumentType.UINT32_STRING, replyserial } });
-            
-      if (null != source) {
-         headers.put(Message.HeaderField.SENDER,source);
-         hargs.add(new Object[] { Message.HeaderField.SENDER, new Object[] { ArgumentType.STRING_STRING, source } });
-      }
- 
-      if (null != dest) {
-         headers.put(Message.HeaderField.DESTINATION,dest);
-         hargs.add(new Object[] { Message.HeaderField.DESTINATION, new Object[] { ArgumentType.STRING_STRING, dest } });
-      }
+    private static final Logger log = Logger.getLogger(Error.class);
 
-      if (null != sig) {
-         hargs.add(new Object[] { Message.HeaderField.SIGNATURE, new Object[] { ArgumentType.SIGNATURE_STRING, sig } });
-         headers.put(Message.HeaderField.SIGNATURE,sig);
-         setArgs(args);
-      }
-      
-      byte[] blen = new byte[4];
-      appendBytes(blen);
-      append("ua(yv)", serial, hargs.toArray());
-      pad((byte)8);
 
-      long c = bytecounter;
-      if (null != sig) append(sig, args);
-      marshallint(bytecounter-c, blen, 0, 4);
-   }
-   public Error(String source, Message m, Throwable e)  throws DBusException
-   {
-      this(source, m.getSource(), AbstractConnection.dollar_pattern.matcher(e.getClass().getName()).replaceAll("."), m.getSerial(), "s", e.getMessage());
-   }
-   public Error(Message m, Throwable e)  throws DBusException
-   {
-      this(m.getSource(), AbstractConnection.dollar_pattern.matcher(e.getClass().getName()).replaceAll("."), m.getSerial(), "s", e.getMessage());
-   }
-   @SuppressWarnings("unchecked")
-   private static Class<? extends DBusExecutionException> createExceptionClass(String name)
-   {
-      if (name == "org.freedesktop.DBus.Local.Disconnected") return NotConnected.class;
-      Class<? extends DBusExecutionException> c = null;
-      do {
-         try {
-            c = (Class<? extends org.freedesktop.dbus.exceptions.DBusExecutionException>) Class.forName(name);
-         } catch (ClassNotFoundException CNFe) {}
-         name = name.replaceAll("\\.([^\\.]*)$", "\\$$1");
-      } while (null == c && name.matches(".*\\..*"));
-      return c;
-   }
-   /**
-    * Turns this into an exception of the correct type
-    */
-   public DBusExecutionException getException() 
-   {
-      try {
-         Class<? extends DBusExecutionException> c = createExceptionClass(getName());
-         if (null == c || !DBusExecutionException.class.isAssignableFrom(c)) c = DBusExecutionException.class;
-         Constructor<? extends DBusExecutionException> con = c.getConstructor(String.class);
-         DBusExecutionException ex;
-         Object[] args = getParameters();
-         if (null == args || 0 == args.length)
-            ex = con.newInstance("");
-         else {
-            String s = "";
-            for (Object o: args)
-               s += o + " ";
-            ex = con.newInstance(s.trim());
-         }
-         ex.setType(getName());
-         return ex;
-      } catch (Exception e) {
-         if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR, e);
-         if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug && null != e.getCause()) 
-            Debug.print(Debug.ERR, e.getCause());
-         DBusExecutionException ex;
-         Object[] args = null;
-         try {
-            args = getParameters();
-         } catch (Exception ee) {}
-         if (null == args || 0 == args.length)
-            ex = new DBusExecutionException("");
-         else {
-            String s = "";
-            for (Object o: args)
-               s += o + " ";
-            ex = new DBusExecutionException(s.trim());
-         }
-         ex.setType(getName());
-         return ex;
-      }
-   }
-   /**
-    * Throw this as an exception of the correct type
-    */
-   public void throwException() throws DBusExecutionException
-   {
-      throw getException();
-   }
+    Error () {}
+
+
+    public Error ( String dest, String errorName, long replyserial, String sig, Object... args ) throws DBusException {
+        this(null, dest, errorName, replyserial, sig, args);
+    }
+
+
+    public Error ( String source, String dest, String errorName, long replyserial, String sig, Object... args ) throws DBusException {
+        super(Message.Endian.BIG, Message.MessageType.ERROR, (byte) 0);
+
+        if ( null == errorName )
+            throw new MessageFormatException("Must specify error name to Errors.");
+        this.headers.put(Message.HeaderField.REPLY_SERIAL, replyserial);
+        this.headers.put(Message.HeaderField.ERROR_NAME, errorName);
+
+        Vector<Object> hargs = new Vector<>();
+        hargs.add(new Object[] {
+            Message.HeaderField.ERROR_NAME, new Object[] {
+                ArgumentType.STRING_STRING, errorName
+            }
+        });
+        hargs.add(new Object[] {
+            Message.HeaderField.REPLY_SERIAL, new Object[] {
+                ArgumentType.UINT32_STRING, replyserial
+            }
+        });
+
+        if ( null != source ) {
+            this.headers.put(Message.HeaderField.SENDER, source);
+            hargs.add(new Object[] {
+                Message.HeaderField.SENDER, new Object[] {
+                    ArgumentType.STRING_STRING, source
+                }
+            });
+        }
+
+        if ( null != dest ) {
+            this.headers.put(Message.HeaderField.DESTINATION, dest);
+            hargs.add(new Object[] {
+                Message.HeaderField.DESTINATION, new Object[] {
+                    ArgumentType.STRING_STRING, dest
+                }
+            });
+        }
+
+        if ( null != sig ) {
+            hargs.add(new Object[] {
+                Message.HeaderField.SIGNATURE, new Object[] {
+                    ArgumentType.SIGNATURE_STRING, sig
+                }
+            });
+            this.headers.put(Message.HeaderField.SIGNATURE, sig);
+            setArgs(args);
+        }
+
+        byte[] blen = new byte[4];
+        appendBytes(blen);
+        append("ua(yv)", this.serial, hargs.toArray());
+        pad((byte) 8);
+
+        long c = this.bytecounter;
+        if ( null != sig )
+            append(sig, args);
+        marshallint(this.bytecounter - c, blen, 0, 4);
+    }
+
+
+    public Error ( String source, Message m, Throwable e ) throws DBusException {
+        this(source, m.getSource(), AbstractConnection.dollar_pattern.matcher(e.getClass().getName()).replaceAll("."), m.getSerial(), "s", e
+                .getMessage());
+    }
+
+
+    public Error ( Message m, Throwable e ) throws DBusException {
+        this(m.getSource(), AbstractConnection.dollar_pattern.matcher(e.getClass().getName()).replaceAll("."), m.getSerial(), "s", e.getMessage());
+    }
+
+
+    private static Class<? extends DBusExecutionException> createExceptionClass ( AbstractConnection conn, String name ) {
+        if ( name == "org.freedesktop.DBus.Local.Disconnected" )
+            return NotConnected.class;
+        Class<? extends DBusExecutionException> c = null;
+        String tmpName = name;
+        if ( tmpName.startsWith("org.freedesktop.DBus.") ) {
+            tmpName = "org.freedesktop.dbus.DBus." + tmpName.substring("org.freedesktop.DBus.".length());
+        }
+        do {
+            try {
+                c = (Class<? extends org.freedesktop.dbus.exceptions.DBusExecutionException>) conn.loadClass(tmpName);
+            }
+            catch ( ClassNotFoundException CNFe ) {}
+            tmpName = tmpName.replaceAll("\\.([^\\.]*)$", "\\$$1");
+        }
+        while ( null == c && tmpName.matches(".*\\..*") );
+        return c;
+    }
+
+
+    /**
+     * Turns this into an exception of the correct type
+     */
+    public DBusExecutionException getException ( AbstractConnection conn ) {
+        try {
+            Class<? extends DBusExecutionException> c = createExceptionClass(conn, getName());
+            if ( null == c || !DBusExecutionException.class.isAssignableFrom(c) )
+                c = DBusExecutionException.class;
+            Constructor<? extends DBusExecutionException> con = c.getConstructor(String.class);
+            DBusExecutionException ex;
+            Object[] args = getParameters();
+            if ( null == args || 0 == args.length )
+                ex = con.newInstance("");
+            else {
+                String s = "";
+                for ( Object o : args )
+                    s += o + " ";
+                ex = con.newInstance(s.trim());
+            }
+            ex.setType(getName());
+            return ex;
+        }
+        catch ( Exception e ) {
+            log.warn(e);
+            DBusExecutionException ex;
+            Object[] args = null;
+            try {
+                args = getParameters();
+            }
+            catch ( Exception ee ) {}
+            if ( null == args || 0 == args.length )
+                ex = new DBusExecutionException("");
+            else {
+                String s = "";
+                for ( Object o : args )
+                    s += o + " ";
+                ex = new DBusExecutionException(s.trim());
+            }
+            ex.setType(getName());
+            return ex;
+        }
+    }
+
+
+    /**
+     * Throw this as an exception of the correct type
+     */
+    public void throwException ( AbstractConnection conn ) throws DBusExecutionException {
+        throw getException(conn);
+    }
 }

@@ -7,14 +7,14 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
 
-@SuppressWarnings("serial")
-public class FatalDBusException extends DBusException implements FatalException
-{
-   public FatalDBusException(String message)
-   {
-      super(message);
-   }
+
+@SuppressWarnings ( "serial" )
+public class FatalDBusException extends DBusException implements FatalException {
+
+    public FatalDBusException ( String message ) {
+        super(message);
+    }
 }

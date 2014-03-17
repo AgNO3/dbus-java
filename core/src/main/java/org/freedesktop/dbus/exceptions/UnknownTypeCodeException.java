@@ -7,15 +7,16 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
-import static org.freedesktop.dbus.Gettext._;
 
-@SuppressWarnings("serial")
-public class UnknownTypeCodeException extends DBusException implements NonFatalException
-{
-   public UnknownTypeCodeException(byte code)
-   {
-      super(_("Not a valid D-Bus type code: ") + code);
-   }
+
+
+
+@SuppressWarnings ( "serial" )
+public class UnknownTypeCodeException extends DBusException implements NonFatalException {
+
+    public UnknownTypeCodeException ( byte code ) {
+        super("Not a valid D-Bus type code: " + code);
+    }
 }

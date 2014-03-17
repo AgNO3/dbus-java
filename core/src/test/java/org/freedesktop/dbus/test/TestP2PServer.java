@@ -7,90 +7,137 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.test;
 
-import java.lang.reflect.Type;
+
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.freedesktop.dbus.DirectConnection;
 import org.freedesktop.dbus.Path;
-import org.freedesktop.dbus.UInt16;
-import org.freedesktop.dbus.Variant;
+import org.freedesktop.dbus.test.data.TestException;
+import org.freedesktop.dbus.test.data.TestRemoteInterface;
+import org.freedesktop.dbus.test.data.TestStruct3;
+import org.freedesktop.dbus.types.UInt16;
+import org.freedesktop.dbus.types.Variant;
 
-public class test_p2p_server implements TestRemoteInterface
-{
-   public int[][] teststructstruct(TestStruct3 in)
-   {
-      List<List<Integer>> lli = in.b;
-      int[][] out = new int[lli.size()][];
-      for (int j = 0; j < out.length; j++) {
-         out[j] = new int[lli.get(j).size()];
-         for (int k = 0; k < out[j].length; k++)
-            out[j][k] = lli.get(j).get(k);
-      }
-      return out;
-   }
-   public String getNameAndThrow()
-	{ 
-		return getName();
-	}
-   public String getName()
-   {
-      System.out.println("getName called");
-      return "Peer2Peer Server";
-   }
-   public <T> int frobnicate(List<Long> n, Map<String,Map<UInt16,Short>> m, T v)
-   {
-      return 3;
-   }
-   public void throwme() throws TestException
-   {
-      System.out.println("throwme called");
-      throw new TestException("BOO");
-   }
-   public void waitawhile()
-   {
-      return;
-   }
-   public int overload()
-   {
-      return 1;
-   }
-   public void sig(Type[] s)
-   {
-   }
-   public void newpathtest(Path p)
-   {
-   }
-	public void reg13291(byte[] as, byte[] bs)
-	{
-	}
-   public Path pathrv(Path a) { return a; }
-   public List<Path> pathlistrv(List<Path> a) { return a; }
-   public Map<Path,Path> pathmaprv(Map<Path,Path> a) { return a; }
-   public boolean isRemote() { return false; }
-   public Map<String, Variant> svm() { return null; }
-   public float testfloat(float[] f)
-   {
-      System.out.println("got float: "+Arrays.toString(f));
-      return f[0];
-   }
 
-   public static void main(String[] args) throws Exception
-   {
-      String address = DirectConnection.createDynamicSession();
-      //String address = "tcp:host=localhost,port=12344,guid="+Transport.genGUID();
-      PrintWriter w = new PrintWriter(new FileOutputStream("address"));
-      w.println(address);
-      w.flush();
-      w.close();
-      DirectConnection dc = new DirectConnection(address+",listen=true");
-      System.out.println("Connected");
-      dc.exportObject("/Test", new test_p2p_server());
-   }      
+public class TestP2PServer implements TestRemoteInterface {
+
+    @Override
+    public int[][] teststructstruct ( TestStruct3 in ) {
+        List<List<Integer>> lli = in.b;
+        int[][] out = new int[lli.size()][];
+        for ( int j = 0; j < out.length; j++ ) {
+            out[ j ] = new int[lli.get(j).size()];
+            for ( int k = 0; k < out[ j ].length; k++ )
+                out[ j ][ k ] = lli.get(j).get(k);
+        }
+        return out;
+    }
+
+
+    @Override
+    public String getNameAndThrow () {
+        return getName();
+    }
+
+
+    @Override
+    public String getName () {
+        System.out.println("getName called");
+        return "Peer2Peer Server";
+    }
+
+
+    @Override
+    public <T> int frobnicate ( List<Long> n, Map<String, Map<UInt16, Short>> m, T v ) {
+        return 3;
+    }
+
+
+    @Override
+    public void throwme () throws TestException {
+        System.out.println("throwme called");
+        throw new TestException("BOO");
+    }
+
+
+    @Override
+    public void waitawhile () {
+        return;
+    }
+
+
+    @Override
+    public int overload () {
+        return 1;
+    }
+
+
+    @Override
+    public void sig ( Type[] s ) {}
+
+
+    @Override
+    public void newpathtest ( Path p ) {}
+
+
+    @Override
+    public void reg13291 ( byte[] as, byte[] bs ) {}
+
+
+    @Override
+    public Path pathrv ( Path a ) {
+        return a;
+    }
+
+
+    @Override
+    public List<Path> pathlistrv ( List<Path> a ) {
+        return a;
+    }
+
+
+    @Override
+    public Map<Path, Path> pathmaprv ( Map<Path, Path> a ) {
+        return a;
+    }
+
+
+    @Override
+    public boolean isRemote () {
+        return false;
+    }
+
+
+    @Override
+    public Map<String, Variant<Object>> svm () {
+        return null;
+    }
+
+
+    @Override
+    public float testfloat ( float[] f ) {
+        System.out.println("got float: " + Arrays.toString(f));
+        return f[ 0 ];
+    }
+
+
+    public static void main ( String[] args ) throws Exception {
+        String address = DirectConnection.createDynamicSession();
+        // String address = "tcp:host=localhost,port=12344,guid="+Transport.genGUID();
+        try ( PrintWriter w = new PrintWriter(new FileOutputStream("address")) ) {
+            w.println(address);
+            w.flush();
+        }
+        DirectConnection dc = new DirectConnection(address + ",listen=true");
+        System.out.println("Connected");
+        dc.exportObject("/Test", new TestP2PServer());
+    }
 }

@@ -7,121 +7,124 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.viewer;
+ */
+package org.freedesktop.dbus.bin.viewer;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-@SuppressWarnings("serial")
-class DBusTableModel extends AbstractTableModel
-{
-	private static final String INTROSPECTABLE = "introspectable?";
 
-	private static final String OWNER = "owner";
+@SuppressWarnings ( "serial" )
+class DBusTableModel extends AbstractTableModel {
 
-	private static final String USER = "user";
+    private static final String INTROSPECTABLE = "introspectable?";
 
-	private static final String NAME = "name";
-	
-	private static final String PATH = "path";
+    private static final String OWNER = "owner";
 
-	final String[] columns = { NAME, PATH, USER, OWNER, INTROSPECTABLE };
+    private static final String USER = "user";
 
-	private List<DBusEntry> entries = new ArrayList<DBusEntry>();
+    private static final String NAME = "name";
 
-	/** {@inheritDoc} */
-	public int getRowCount()
-	{
-		return entries.size();
-	}
-	/** Add a row to the table model
-	 * 
-	 * @param entry The dbus entry to add
-	 */
-	public void add(DBusEntry entry)
-	{
-		entries.add(entry);
-	}
+    private static final String PATH = "path";
 
-	/** {@inheritDoc} */
-	public int getColumnCount()
-	{
-		return columns.length;
-	}
+    final String[] columns = {
+        NAME, PATH, USER, OWNER, INTROSPECTABLE
+    };
 
-	/** {@inheritDoc} */
-	@Override
-	public String getColumnName(int column)
-	{
-		return columns[column];
-	}
-	
-	/** Get a row of the table
-	 * @param row The row index
-	 * @return The table row
-	 */
-	public DBusEntry getEntry(int row)
-	{
-		return entries.get(row);
-	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public Class<?> getColumnClass(int columnIndex)
-	{
-		String columnName = getColumnName(columnIndex);
-		if (columnName.equals(NAME))
-		{
-			return String.class;
-		}
-		if (columnName.equals(PATH))
-		{
-			return String.class;
-		}
-		else if (columnName.equals(USER))
-		{
-			return Object.class;
-		}
-		else if (columnName.equals(OWNER))
-		{
-			return String.class;
-		}
-		else if (columnName.equals(INTROSPECTABLE))
-		{
-			return Boolean.class;
-		}
-		return super.getColumnClass(columnIndex);
-	}
+    private List<DBusEntry> entries = new ArrayList<>();
 
-	/** {@inheritDoc} */
-	public Object getValueAt(int rowIndex, int columnIndex)
-	{
-		DBusEntry entry = getEntry(rowIndex);
-		String columnName = getColumnName(columnIndex);
-		if (columnName.equals(NAME))
-		{
-			return entry.getName();
-		}
-		if (columnName.equals(PATH))
-		{
-			return entry.getPath();
-		}
-		else if (columnName.equals(USER))
-		{
-			return entry.getUser();
-		}
-		else if (columnName.equals(OWNER))
-		{
-			return entry.getOwner();
-		}
-		else if (columnName.equals(INTROSPECTABLE))
-		{
-			return entry.getIntrospectable() != null;
-		}
-		return null;
-	}
+
+    /** {@inheritDoc} */
+    @Override
+    public int getRowCount () {
+        return this.entries.size();
+    }
+
+
+    /**
+     * Add a row to the table model
+     * 
+     * @param entry
+     *            The dbus entry to add
+     */
+    public void add ( DBusEntry entry ) {
+        this.entries.add(entry);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public int getColumnCount () {
+        return this.columns.length;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public String getColumnName ( int column ) {
+        return this.columns[ column ];
+    }
+
+
+    /**
+     * Get a row of the table
+     * 
+     * @param row
+     *            The row index
+     * @return The table row
+     */
+    public DBusEntry getEntry ( int row ) {
+        return this.entries.get(row);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Class<?> getColumnClass ( int columnIndex ) {
+        String columnName = getColumnName(columnIndex);
+        if ( columnName.equals(NAME) ) {
+            return String.class;
+        }
+        if ( columnName.equals(PATH) ) {
+            return String.class;
+        }
+        else if ( columnName.equals(USER) ) {
+            return Object.class;
+        }
+        else if ( columnName.equals(OWNER) ) {
+            return String.class;
+        }
+        else if ( columnName.equals(INTROSPECTABLE) ) {
+            return Boolean.class;
+        }
+        return super.getColumnClass(columnIndex);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Object getValueAt ( int rowIndex, int columnIndex ) {
+        DBusEntry entry = getEntry(rowIndex);
+        String columnName = getColumnName(columnIndex);
+        if ( columnName.equals(NAME) ) {
+            return entry.getName();
+        }
+        if ( columnName.equals(PATH) ) {
+            return entry.getPath();
+        }
+        else if ( columnName.equals(USER) ) {
+            return entry.getUser();
+        }
+        else if ( columnName.equals(OWNER) ) {
+            return entry.getOwner();
+        }
+        else if ( columnName.equals(INTROSPECTABLE) ) {
+            return entry.getIntrospectable() != null;
+        }
+        return null;
+    }
 
 }

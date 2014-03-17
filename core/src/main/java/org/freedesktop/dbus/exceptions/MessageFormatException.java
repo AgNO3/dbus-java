@@ -7,17 +7,17 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.exceptions;
+
 
 /**
  * Thrown if a message is formatted incorrectly.
  */
-@SuppressWarnings("serial")
-public class MessageFormatException extends DBusException implements NonFatalException
-{
-   public MessageFormatException(String message)
-   {
-      super (message);
-   }
+@SuppressWarnings ( "serial" )
+public class MessageFormatException extends DBusException implements NonFatalException {
+
+    public MessageFormatException ( String message ) {
+        super(message);
+    }
 }

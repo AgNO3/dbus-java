@@ -7,105 +7,134 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus;
 
-import static org.freedesktop.dbus.Gettext._;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.freedesktop.DBus.Error.NoReply;
+import org.apache.log4j.Logger;
+import org.freedesktop.dbus.DBus.Error.NoReply;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.freedesktop.dbus.exceptions.DBusExecutionException;
 
-import cx.ath.matthew.debug.Debug;
 
 /**
  * A handle to an asynchronous method call.
  */
-public class DBusAsyncReply<ReturnType>
-{
-   /**
-    * Check if any of a set of asynchronous calls have had a reply.
-    * @param replies A Collection of handles to replies to check.
-    * @return A Collection only containing those calls which have had replies.
-    */
-   public static Collection<DBusAsyncReply<? extends Object>> hasReply(Collection<DBusAsyncReply<? extends Object>> replies)
-   {
-      Collection<DBusAsyncReply<? extends Object>> c = new ArrayList<DBusAsyncReply<? extends Object>>(replies);
-      Iterator<DBusAsyncReply<? extends Object>> i = c.iterator();
-      while (i.hasNext())
-         if (!i.next().hasReply()) i.remove();
-      return c;
-   }
+public class DBusAsyncReply <ReturnType> {
 
-   private ReturnType rval = null;
-   private DBusExecutionException error = null;
-   private MethodCall mc;
-   private Method me;
-   private AbstractConnection conn;
-   DBusAsyncReply(MethodCall mc, Method me, AbstractConnection conn)
-   {
-      this.mc = mc;
-      this.me = me;
-      this.conn = conn;
-   }
-   @SuppressWarnings("unchecked")
-   private synchronized void checkReply()
-   {
-      if (mc.hasReply()) {
-         Message m = mc.getReply();
-         if (m instanceof Error)
-            error = ((Error) m).getException();
-         else if (m instanceof MethodReturn) {
-            try {
-               rval = (ReturnType) RemoteInvocationHandler.convertRV(m.getSig(), m.getParameters(), me, conn);
-            } catch (DBusExecutionException DBEe) {
-               error = DBEe;
-            } catch (DBusException DBe) {
-               if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR, DBe);
-               error = new DBusExecutionException(DBe.getMessage());
+    private static final Logger log = Logger.getLogger(DBusAsyncReply.class);
+
+
+    /**
+     * Check if any of a set of asynchronous calls have had a reply.
+     * 
+     * @param replies
+     *            A Collection of handles to replies to check.
+     * @return A Collection only containing those calls which have had replies.
+     */
+    public static Collection<DBusAsyncReply<? extends Object>> hasReply ( Collection<DBusAsyncReply<? extends Object>> replies ) {
+        Collection<DBusAsyncReply<? extends Object>> c = new ArrayList<>(replies);
+        Iterator<DBusAsyncReply<? extends Object>> i = c.iterator();
+        while ( i.hasNext() )
+            if ( !i.next().hasReply() )
+                i.remove();
+        return c;
+    }
+
+    private ReturnType rval = null;
+    private DBusExecutionException error = null;
+    private MethodCall mc;
+    private Method me;
+    private AbstractConnection conn;
+
+
+    DBusAsyncReply ( MethodCall mc, Method me, AbstractConnection conn ) {
+        this.mc = mc;
+        this.me = me;
+        this.conn = conn;
+    }
+
+
+    private synchronized void checkReply () {
+        if ( this.mc.hasReply() ) {
+            Message m = this.mc.getReply();
+            if ( m instanceof Error )
+                this.error = ( (Error) m ).getException(this.conn);
+            else if ( m instanceof MethodReturn ) {
+                try {
+                    this.rval = (ReturnType) RemoteInvocationHandler.convertRV(m.getSig(), m.getParameters(), this.me, this.conn);
+                }
+                catch ( DBusExecutionException DBEe ) {
+                    this.error = DBEe;
+                }
+                catch ( DBusException DBe ) {
+                    log.warn(DBe);
+                    this.error = new DBusExecutionException(DBe.getMessage());
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   /**
-    * Check if we've had a reply.
-    * @return True if we have a reply
-    */
-   public boolean hasReply()
-   {
-      if (null != rval || null != error) return true;
-      checkReply();
-      return null != rval || null != error;
-   }
-   
-   /**
-    * Get the reply.
-    * @return The return value from the method.
-    * @throws DBusExecutionException if the reply to the method was an error.
-    * @throws NoReply if the method hasn't had a reply yet
-    */
-   public ReturnType getReply() throws DBusExecutionException
-   {
-      if (null != rval) return rval;
-      else if (null != error) throw error;
-      checkReply();
-      if (null != rval) return rval;
-      else if (null != error) throw error;
-      else throw new NoReply(_("Async call has not had a reply"));
-   }
 
-   public String toString()
-   {
-      return _("Waiting for: ")+mc;
-   }
-   Method getMethod() { return me; }
-   AbstractConnection getConnection() { return conn; }
-   MethodCall getCall() { return mc; }
+    /**
+     * Check if we've had a reply.
+     * 
+     * @return True if we have a reply
+     */
+    public boolean hasReply () {
+        if ( null != this.rval || null != this.error )
+            return true;
+        checkReply();
+        return null != this.rval || null != this.error;
+    }
+
+
+    /**
+     * Get the reply.
+     * 
+     * @return The return value from the method.
+     * @throws DBusExecutionException
+     *             if the reply to the method was an error.
+     * @throws NoReply
+     *             if the method hasn't had a reply yet
+     */
+    public ReturnType getReply () throws DBusExecutionException {
+        if ( null != this.rval )
+            return this.rval;
+        else if ( null != this.error )
+            throw this.error;
+        checkReply();
+        if ( null != this.rval )
+            return this.rval;
+        else if ( null != this.error )
+            throw this.error;
+        else
+            throw new NoReply("Async call has not had a reply");
+    }
+
+
+    @Override
+    public String toString () {
+        return "Waiting for: " + this.mc;
+    }
+
+
+    Method getMethod () {
+        return this.me;
+    }
+
+
+    AbstractConnection getConnection () {
+        return this.conn;
+    }
+
+
+    MethodCall getCall () {
+        return this.mc;
+    }
 }
-

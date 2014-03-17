@@ -7,24 +7,27 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
-package org.freedesktop.dbus.test;
+ */
+package org.freedesktop.dbus.test.data;
+
 
 import org.freedesktop.dbus.Position;
-import org.freedesktop.dbus.Tuple;
+import org.freedesktop.dbus.types.Tuple;
 
-public final class TestTuple<A,B,C> extends Tuple
-{
-   @Position(0)
-   public final A a;
-   @Position(1)
-   public final B b;
-   @Position(2)
-   public final C c;
-   public TestTuple(A a, B b, C c)
-   {
-      this.a = a;
-      this.b = b;
-      this.c = c;
-   }
+
+public final class TestTuple <A, B, C> extends Tuple {
+
+    @Position ( 0 )
+    public final A a;
+    @Position ( 1 )
+    public final B b;
+    @Position ( 2 )
+    public final C c;
+
+
+    public TestTuple ( A a, B b, C c ) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
 }

@@ -7,38 +7,48 @@
    Academic Free Licence Version 2.1.
 
    Full licence texts are included in the COPYING file with this program.
-*/
+ */
 package org.freedesktop.dbus.types;
+
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.freedesktop.dbus.Struct;
+
 
 /**
  * The type of a struct.
  * Should be used whenever you need a Type variable for a struct.
  */
-public class DBusStructType implements ParameterizedType
-{
-   private Type[] contents;
-   /**
-    * Create a struct type.
-    * @param contents The types contained in this struct.
-    */
-   public DBusStructType(Type... contents)
-   {
-      this.contents = contents;
-   }
-   public Type[] getActualTypeArguments()
-   {
-      return contents;
-   }
-   public Type getRawType()
-   {
-      return Struct.class;
-   }
-   public Type getOwnerType()
-   {
-      return null;
-   }
+public class DBusStructType implements ParameterizedType {
+
+    private Type[] contents;
+
+
+    /**
+     * Create a struct type.
+     * 
+     * @param contents
+     *            The types contained in this struct.
+     */
+    public DBusStructType ( Type... contents ) {
+        this.contents = contents;
+    }
+
+
+    @Override
+    public Type[] getActualTypeArguments () {
+        return this.contents;
+    }
+
+
+    @Override
+    public Type getRawType () {
+        return Struct.class;
+    }
+
+
+    @Override
+    public Type getOwnerType () {
+        return null;
+    }
 }
