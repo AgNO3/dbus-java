@@ -114,22 +114,34 @@ public class RemoteInvocationHandler implements InvocationHandler {
                 name = m.getAnnotation(DBusMemberName.class).value();
             else
                 name = m.getName();
-            if ( null == ro.iface )
-                call = new MethodCall(ro.busname, ro.objectpath, null, name, flags, sig, args);
-            else {
-                if ( null != ro.iface.getAnnotation(DBusInterfaceName.class) ) {
-                    call = new MethodCall(ro.busname, ro.objectpath, ro.iface.getAnnotation(DBusInterfaceName.class).value(), name, flags, sig, args);
+
+            Class<?> iface = ro.iface;
+            if ( null == iface ) {
+                iface = m.getDeclaringClass();
+                while ( Proxy.isProxyClass(iface) ) {
+                    Class<?>[] ifs = iface.getInterfaces();
+                    for ( Class<?> superIf : ifs ) {
+                        if ( DBusInterface.class.isAssignableFrom(superIf) ) {
+                            iface = superIf;
+                            break;
+                        }
+                    }
                 }
-                else
-                    call = new MethodCall(
-                        ro.busname,
-                        ro.objectpath,
-                        AbstractConnection.dollar_pattern.matcher(ro.iface.getName()).replaceAll("."),
-                        name,
-                        flags,
-                        sig,
-                        args);
             }
+
+            if ( null != iface.getAnnotation(DBusInterfaceName.class) ) {
+                call = new MethodCall(ro.busname, ro.objectpath, iface.getAnnotation(DBusInterfaceName.class).value(), name, flags, sig, args);
+            }
+            else
+                call = new MethodCall(
+                    ro.busname,
+                    ro.objectpath,
+                    AbstractConnection.dollar_pattern.matcher(iface.getName()).replaceAll("."),
+                    name,
+                    flags,
+                    sig,
+                    args);
+
         }
         catch ( DBusException DBe ) {
             log.warn(DBe);

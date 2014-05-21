@@ -132,6 +132,7 @@ public abstract class AbstractConnection {
                     catch ( Exception e ) {
                         log.debug("Exception for incoming message:", e);
                         if ( e instanceof FatalException ) {
+                            log.error("Fatal exception, disconnecting:", e);
                             disconnect();
                         }
                     }
@@ -261,12 +262,13 @@ public abstract class AbstractConnection {
 
             log.info("Flushing outbound queue and quitting");
             // flush the outbound queue before disconnect.
-            if ( null != AbstractConnection.this.outgoing )
+            if ( null != AbstractConnection.this.outgoing ) {
+                EfficientQueue ogq = AbstractConnection.this.outgoing;
+                synchronized ( ogq ) {
+                    AbstractConnection.this.outgoing = null;
+                }
                 do {
-                    EfficientQueue ogq = AbstractConnection.this.outgoing;
-                    synchronized ( ogq ) {
-                        AbstractConnection.this.outgoing = null;
-                    }
+
                     if ( !ogq.isEmpty() )
                         m = ogq.remove();
                     else
@@ -281,7 +283,8 @@ public abstract class AbstractConnection {
                 }
                 while ( null != m );
 
-            // close the underlying streams
+                // close the underlying streams
+            }
         }
     }
 
@@ -1240,7 +1243,7 @@ public abstract class AbstractConnection {
 
         }
         catch ( Exception e ) {
-            log.debug("Failed to send message", e);
+            log.warn("Failed to send message", e);
             if ( m instanceof MethodCall && e instanceof NotConnected )
                 try {
                     ( (MethodCall) m ).setReply(new Error(

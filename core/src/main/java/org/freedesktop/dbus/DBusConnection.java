@@ -432,7 +432,11 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             Vector<String> ifaces = new Vector<>();
             for ( String tag : tags ) {
                 if ( tag.startsWith("interface") ) {
-                    ifaces.add(tag.replaceAll("^interface *name *= *['\"]([^'\"]*)['\"].*$", "$1"));
+                    String ifName = tag.replaceAll("^interface *name *= *['\"]([^'\"]*)['\"].*$", "$1");
+                    if ( ifName.startsWith("org.freedesktop.DBus") ) {
+                        ifName = ifName.replace("org.freedesktop.DBus", "org.freedesktop.dbus.DBus");
+                    }
+                    ifaces.add(ifName);
                 }
             }
             Vector<Class<? extends Object>> ifcs = new Vector<>();
