@@ -4,7 +4,7 @@
 
 	<artifactId>java-dbus</artifactId>
 	<groupId>eu.agno3</groupId>
-	<version>3.6</version>
+	<version>3.7</version>
 
 	<packaging>pom</packaging>
 	<name>Java DBUS</name>

@@ -467,7 +467,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
 
             RemoteObject ro = new RemoteObject(source, path, null, false);
             DBusInterface newi = (DBusInterface) Proxy.newProxyInstance(
-                ifcs.get(0).getClassLoader(),
+                this.getUserClassLoader(),
                 ifcs.toArray(new Class[0]),
                 new RemoteInvocationHandler(this, ro));
             this.importedObjects.put(newi, ro);

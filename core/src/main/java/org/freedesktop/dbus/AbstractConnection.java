@@ -132,7 +132,7 @@ public abstract class AbstractConnection {
                     catch ( Exception e ) {
                         log.debug("Exception for incoming message:", e);
                         if ( e instanceof FatalException ) {
-                            log.error("Fatal exception, disconnecting:", e);
+                            log.info("Fatal exception, disconnecting:", e);
                             disconnect();
                         }
                     }
@@ -1243,7 +1243,7 @@ public abstract class AbstractConnection {
 
         }
         catch ( Exception e ) {
-            log.warn("Failed to send message", e);
+            log.debug("Failed to send message", e);
             if ( m instanceof MethodCall && e instanceof NotConnected )
                 try {
                     ( (MethodCall) m ).setReply(new Error(
