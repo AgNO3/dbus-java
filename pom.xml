@@ -53,6 +53,7 @@
 	<modules>
 		<module>core</module>
 		<module>apps</module>
+		<module>dummy</module>
 	</modules>
 
 
