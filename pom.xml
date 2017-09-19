@@ -3,7 +3,7 @@
 
 	<artifactId>java-dbus</artifactId>
 	<groupId>eu.agno3</groupId>
-	<version>3.11</version>
+	<version>3.12-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>Java DBUS</name>
@@ -32,7 +32,7 @@
 		<connection>scm:git:https://github.com/AgNO3/dbus-java.git</connection>
 		<developerConnection>scm:git:https://github.com/AgNO3/dbus-java.git</developerConnection>
 		<url>git@github.com:AgNO3/dbus-java.git</url>
-		<tag>java-dbus-3.11</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>

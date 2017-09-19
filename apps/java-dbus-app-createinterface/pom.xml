@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.agno3</groupId>
 		<artifactId>java-dbus-apps</artifactId>
-		<version>3.11</version>
+		<version>3.12-SNAPSHOT</version>
 	</parent>
 	<artifactId>java-dbus-app-createinterface</artifactId>
 	<name>Java DBUS Interface Generator App</name>
