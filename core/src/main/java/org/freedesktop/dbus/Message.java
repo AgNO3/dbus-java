@@ -557,7 +557,7 @@ public class Message {
             params = getParameters();
         }
         catch ( DBusException DBe ) {
-            log.warn(DBe);
+            log.warn("Failed to get parameters", DBe);
         }
         if ( null == params || 0 == params.length )
             sb.append('}');
@@ -677,8 +677,7 @@ public class Message {
                     payloadbytes = payload.getBytes("UTF-8");
                 }
                 catch ( UnsupportedEncodingException UEe ) {
-                    log.warn(UEe);
-                    throw new DBusException("System does not support UTF-8 encoding");
+                    throw new DBusException("System does not support UTF-8 encoding", UEe);
                 }
                 if ( log.isTraceEnabled() ) {
                     log.trace("Appending String of length " + payloadbytes.length);
@@ -854,11 +853,10 @@ public class Message {
             return i;
         }
         catch ( ClassCastException CCe ) {
-            log.warn(CCe);
             throw new MarshallingException(String.format(
                 "Trying to marshall to unconvertable type (from %s to %s).",
                 data.getClass().getName(),
-                sigb[ sigofs ]));
+                sigb[ sigofs ]), CCe);
         }
     }
 
@@ -1181,8 +1179,7 @@ public class Message {
                 rv = new String(buf, ofs[ 1 ], length, "UTF-8");
             }
             catch ( UnsupportedEncodingException UEe ) {
-                log.warn(UEe);
-                throw new DBusException("System does not support UTF-8 encoding");
+                throw new DBusException("System does not support UTF-8 encoding", UEe);
             }
             ofs[ 1 ] += length + 1;
             break;

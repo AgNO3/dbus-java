@@ -17,12 +17,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * This class is the super class of both Structs and Tuples
  * and holds common methods.
  */
 public abstract class Container {
+
+    private static final Logger log = Logger.getLogger(Container.class);
 
     private static Map<Type, Type[]> typecache = new HashMap<>();
 
@@ -56,7 +60,9 @@ public abstract class Container {
             try {
                 args[ p.value() ] = f.get(this);
             }
-            catch ( IllegalAccessException IAe ) {}
+            catch ( IllegalAccessException IAe ) {
+                log.debug("Failed to get Position args", IAe);
+            }
         }
 
         this.parameters = new Object[args.length - diff];

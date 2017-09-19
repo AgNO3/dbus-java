@@ -17,4 +17,30 @@ public class FatalDBusException extends DBusException implements FatalException 
     public FatalDBusException ( String message ) {
         super(message);
     }
+
+
+    /**
+     * 
+     */
+    public FatalDBusException () {
+        super();
+    }
+
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public FatalDBusException ( String message, Throwable cause ) {
+        super(message, cause);
+    }
+
+
+    /**
+     * @param cause
+     */
+    public FatalDBusException ( Throwable cause ) {
+        super(cause);
+    }
+
 }

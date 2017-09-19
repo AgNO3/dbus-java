@@ -64,7 +64,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                 addSigHandler(new DBusMatchRule(DBus.NameOwnerChanged.class, null, null), this);
             }
             catch ( DBusException DBe ) {
-                log.warn(DBe);
+                log.warn("Failed to add signal handler", DBe);
             }
         }
 
@@ -224,7 +224,9 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                         DBusConnection.this.pendingErrors.add(err);
                     }
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failed to handle disconnect signlar", DBe);
+                }
             }
             else if ( s instanceof org.freedesktop.dbus.DBus.NameAcquired ) {
                 DBusConnection.this.busnames.add( ( (org.freedesktop.dbus.DBus.NameAcquired) s ).name);
@@ -349,7 +351,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                         }
                     }
                     catch ( Exception e ) {
-                        throw new DBusException("Cannot Resolve Session Bus Address");
+                        throw new DBusException("Cannot Resolve Session Bus Address", e);
                     }
                 }
                 break;
@@ -390,14 +392,12 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             this.connected = true;
         }
         catch ( IOException IOe ) {
-            log.warn("Failed to connect to bus", IOe);
             disconnect();
-            throw new DBusException("Failed to connect to bus " + IOe.getMessage());
+            throw new DBusException("Failed to connect to bus " + IOe.getMessage(), IOe);
         }
         catch ( ParseException Pe ) {
-            log.warn(Pe);
             disconnect();
-            throw new DBusException("Failed to connect to bus " + Pe.getMessage());
+            throw new DBusException("Failed to connect to bus " + Pe.getMessage(), Pe);
         }
 
         // start listening for calls
@@ -414,8 +414,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             this.busnames.add(this._dbus.Hello());
         }
         catch ( DBusExecutionException DBEe ) {
-            log.warn(DBEe);
-            throw new DBusException(DBEe.getMessage());
+            throw new DBusException(DBEe.getMessage(), DBEe);
         }
     }
 
@@ -463,7 +462,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             }
 
             if ( ifcs.size() == 0 )
-                throw new DBusException("Could not find an interface to cast to");
+                throw new DBusException(String.format("Could not find an interface to cast to have [%s]", ifaces));
 
             RemoteObject ro = new RemoteObject(source, path, null, false);
             DBusInterface newi = (DBusInterface) Proxy.newProxyInstance(
@@ -473,9 +472,11 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             this.importedObjects.put(newi, ro);
             return newi;
         }
+        catch ( DBusExecutionException e ) {
+            throw e;
+        }
         catch ( Exception e ) {
-            log.warn(e);
-            throw new DBusException(String.format("Failed to create proxy object for %s exported by %s. Reason: %s", path, source, e.getMessage()));
+            throw new DBusException(String.format("Failed to create proxy object for %s exported by %s. Reason: %s", path, source, e.getMessage()), e);
         }
     }
 
@@ -542,8 +543,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                 rv = this._dbus.RequestName(busname, new UInt32(DBus.DBUS_NAME_FLAG_REPLACE_EXISTING | DBus.DBUS_NAME_FLAG_DO_NOT_QUEUE));
             }
             catch ( DBusExecutionException DBEe ) {
-                log.warn(DBEe);
-                throw new DBusException(DBEe.getMessage());
+                throw new DBusException(DBEe.getMessage(), DBEe);
             }
             switch ( rv.intValue() ) {
             case DBus.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER:
@@ -787,6 +787,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             throw new DBusException("DBusInterfaces cannot be declared outside a package");
 
         RemoteObject ro = new RemoteObject(busname, objectpath, type, autostart);
+        @SuppressWarnings ( "unchecked" )
         I i = (I) Proxy.newProxyInstance(type.getClassLoader(), new Class[] {
             type
         }, new RemoteInvocationHandler(this, ro));
@@ -863,11 +864,10 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                         this._dbus.RemoveMatch(rule.toString());
                     }
                     catch ( NotConnected NC ) {
-                        log.warn(NC);
+                        log.warn("Not connected", NC);
                     }
                     catch ( DBusExecutionException DBEe ) {
-                        log.warn(DBEe);
-                        throw new DBusException(DBEe.getMessage());
+                        throw new DBusException(DBEe.getMessage(), DBEe);
                     }
                 }
             }
@@ -942,8 +942,7 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
             this._dbus.AddMatch(rule.toString());
         }
         catch ( DBusExecutionException DBEe ) {
-            log.warn(DBEe);
-            throw new DBusException(DBEe.getMessage());
+            throw new DBusException(DBEe.getMessage(), DBEe);
         }
         SignalTuple key = new SignalTuple(rule.getInterface(), rule.getMember(), rule.getObject(), rule.getSource());
         synchronized ( this.handledSignals ) {
@@ -989,7 +988,9 @@ public class DBusConnection extends AbstractConnection implements AutoCloseable 
                             this.pendingErrors.add(err);
                         }
                     }
-                    catch ( DBusException DBe ) {}
+                    catch ( DBusException DBe ) {
+                        log.debug("Failure while disconnecting", DBe);
+                    }
 
                     conn.remove(this.addr);
                     super.disconnect();

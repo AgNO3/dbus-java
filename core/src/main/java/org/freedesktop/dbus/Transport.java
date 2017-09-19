@@ -344,7 +344,7 @@ public class Transport {
                 return new Command(sb.toString());
             }
             catch ( Exception e ) {
-                log.warn(e);
+                log.warn("Failed to read command", e);
                 return new Command();
             }
         }
@@ -412,7 +412,7 @@ public class Transport {
                     md = MessageDigest.getInstance("SHA");
                 }
                 catch ( NoSuchAlgorithmException NSAe ) {
-                    log.warn(NSAe);
+                    log.warn("Failed to get message digest", NSAe);
                     return ERROR;
                 }
                 byte[] buf = new byte[8];
@@ -455,7 +455,7 @@ public class Transport {
                 md = MessageDigest.getInstance("SHA");
             }
             catch ( NoSuchAlgorithmException NSAe ) {
-                log.warn(NSAe);
+                log.warn("Failed to get message digest", NSAe);
                 return ERROR;
             }
             switch ( auth ) {
@@ -481,7 +481,7 @@ public class Transport {
                         addCookie(context, "" + id, id / 1000, this.cookie);
                     }
                     catch ( IOException IOe ) {
-                        log.warn(IOe);
+                        log.warn("IOException during cookie auth", IOe);
                     }
                     if ( log.isDebugEnabled() ) {
                         log.debug("Sending challenge: " + context + ' ' + id + ' ' + this.challenge);
@@ -568,6 +568,7 @@ public class Transport {
                 Uid = "" + uid;
             }
             catch ( Exception e ) {
+                log.debug("Failed to get uid, fallback to user.name", e);
                 Uid = username;
             }
             Uid = Hex.encodeHexString(Uid.getBytes("ASCII"));

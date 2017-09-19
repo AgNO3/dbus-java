@@ -56,8 +56,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
             }, conn);
         }
         catch ( Exception e ) {
-            log.warn("", e);
-            throw new DBusExecutionException(String.format("Wrong return type (failed to de-serialize correct types: %s )", e.getMessage()));
+            throw new DBusExecutionException(String.format("Wrong return type (failed to de-serialize correct types: %s )", e.getMessage()), e);
         }
 
         switch ( rp.length ) {
@@ -79,8 +78,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
                 return cons.newInstance(rp);
             }
             catch ( Exception e ) {
-                log.warn(e);
-                throw new DBusException(e.getMessage());
+                throw new DBusException(e.getMessage(), e);
             }
         }
     }
@@ -98,7 +96,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
                 args = Marshalling.convertParameters(args, ts, conn);
             }
             catch ( DBusException DBe ) {
-                throw new DBusExecutionException("Failed to construct D-Bus type: " + DBe.getMessage());
+                throw new DBusExecutionException("Failed to construct D-Bus type: " + DBe.getMessage(), DBe);
             }
         MethodCall call;
         byte flags = 0;
@@ -144,8 +142,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
 
         }
         catch ( DBusException DBe ) {
-            log.warn(DBe);
-            throw new DBusExecutionException("Failed to construct outgoing method call: " + DBe.getMessage());
+            throw new DBusExecutionException("Failed to construct outgoing method call: " + DBe.getMessage(), DBe);
         }
         if ( null == conn.outgoing )
             throw new NotConnected("Not Connected");
@@ -184,8 +181,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
             return convertRV(reply.getSig(), reply.getParameters(), m, conn);
         }
         catch ( DBusException e ) {
-            log.warn(e);
-            throw new DBusExecutionException(e.getMessage());
+            throw new DBusExecutionException(e.getMessage(), e);
         }
     }
 
@@ -219,6 +215,7 @@ public class RemoteInvocationHandler implements InvocationHandler {
                     return new Boolean(this.remote.equals( ( (RemoteInvocationHandler) Proxy.getInvocationHandler(args[ 0 ]) ).remote));
             }
             catch ( IllegalArgumentException IAe ) {
+                log.debug("Invalid equals method", IAe);
                 return Boolean.FALSE;
             }
         }

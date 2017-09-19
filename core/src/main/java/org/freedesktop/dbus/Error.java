@@ -108,6 +108,7 @@ public class Error extends Message {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     private static Class<? extends DBusExecutionException> createExceptionClass ( AbstractConnection conn, String name ) {
         if ( name == "org.freedesktop.DBus.Local.Disconnected" )
             return NotConnected.class;
@@ -120,7 +121,9 @@ public class Error extends Message {
             try {
                 c = (Class<? extends org.freedesktop.dbus.exceptions.DBusExecutionException>) conn.loadClass(tmpName);
             }
-            catch ( ClassNotFoundException CNFe ) {}
+            catch ( ClassNotFoundException CNFe ) {
+                log.debug("Exception class not found " + tmpName, CNFe);
+            }
             tmpName = tmpName.replaceAll("\\.([^\\.]*)$", "\\$$1");
         }
         while ( null == c && tmpName.matches(".*\\..*") );
@@ -151,13 +154,15 @@ public class Error extends Message {
             return ex;
         }
         catch ( Exception e ) {
-            log.warn(e);
+            log.warn("Failed to build exception", e);
             DBusExecutionException ex;
             Object[] args = null;
             try {
                 args = getParameters();
             }
-            catch ( Exception ee ) {}
+            catch ( Exception ee ) {
+                log.debug("Exception getting parameters", ee);
+            }
             if ( null == args || 0 == args.length )
                 ex = new DBusExecutionException("");
             else {

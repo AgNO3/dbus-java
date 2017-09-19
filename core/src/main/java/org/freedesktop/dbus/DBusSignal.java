@@ -136,6 +136,7 @@ public class DBusSignal extends Message {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     private static Class<? extends DBusSignal> createSignalClass ( AbstractConnection conn, String intname, String signame ) throws DBusException {
         String name = intname + '$' + signame;
         Class<? extends DBusSignal> c = classCache.get(name);
@@ -147,7 +148,9 @@ public class DBusSignal extends Message {
             try {
                 c = (Class<? extends DBusSignal>) conn.loadClass(name);
             }
-            catch ( ClassNotFoundException CNFe ) {}
+            catch ( ClassNotFoundException CNFe ) {
+                log.debug("Class not found " + name, CNFe);
+            }
             name = name.replaceAll("\\.([^\\.]*)$", "\\$$1");
         }
         while ( null == c && name.matches(".*\\..*") );
@@ -210,8 +213,8 @@ public class DBusSignal extends Message {
             return s;
         }
         catch ( Exception e ) {
-            log.warn(e);
-            throw new DBusException(e.getMessage());
+            log.warn("Error creating signal", e);
+            throw new DBusException(e.getMessage(), e);
         }
     }
 
@@ -296,8 +299,8 @@ public class DBusSignal extends Message {
                 setArgs(args);
             }
             catch ( Exception e ) {
-                log.warn(e);
-                throw new DBusException("Failed to add signal parameters: " + e.getMessage());
+                log.warn("Error adding signal parameters", e);
+                throw new DBusException("Failed to add signal parameters: " + e.getMessage(), e);
             }
         }
 

@@ -785,6 +785,7 @@ public class CreateInterface {
      */
     public void createInterface ( Reader introspectdata ) throws ParserConfigurationException, SAXException, IOException, DBusException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         DocumentBuilder builder = dbf.newDocumentBuilder();
         Document document = builder.parse(new InputSource(introspectdata));
 

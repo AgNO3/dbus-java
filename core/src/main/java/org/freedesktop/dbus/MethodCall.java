@@ -154,6 +154,7 @@ public class MethodCall extends Message {
             return this.reply;
         }
         catch ( InterruptedException Ie ) {
+            log.debug("Interrupted getReply", Ie);
             return this.reply;
         }
     }
@@ -176,6 +177,7 @@ public class MethodCall extends Message {
             return this.reply;
         }
         catch ( InterruptedException Ie ) {
+            log.debug("Interrupted getReply", Ie);
             return this.reply;
         }
     }

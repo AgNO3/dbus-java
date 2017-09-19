@@ -792,11 +792,9 @@ public abstract class AbstractConnection {
                 parameters);
         }
         catch ( DBusExecutionException DBEe ) {
-            log.warn("Failed to call (callback)", DBEe);
             throw DBEe;
         }
         catch ( Exception e ) {
-            log.warn("Failed to call (callback)", e);
             throw new DBusExecutionException(e.getMessage());
         }
     }
@@ -834,11 +832,9 @@ public abstract class AbstractConnection {
                 parameters);
         }
         catch ( DBusExecutionException DBEe ) {
-            log.warn("Failed to call (async)", DBEe);
             throw DBEe;
         }
         catch ( Exception e ) {
-            log.warn("Failed to call (async)", e);
             throw new DBusExecutionException(e.getMessage());
         }
     }
@@ -890,7 +886,9 @@ public abstract class AbstractConnection {
                 try {
                     queueOutgoing(new Error(m, new DBus.Error.UnknownObject(m.getPath() + " is not an object provided by this process.")));
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failure queuing error", DBe);
+                }
                 return;
             }
             if ( log.isTraceEnabled() ) {
@@ -907,7 +905,9 @@ public abstract class AbstractConnection {
                         m.getInterface(),
                         m.getName()))));
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failure queuing error", DBe);
+                }
                 return;
             }
             o = eo.object.get();
@@ -951,7 +951,9 @@ public abstract class AbstractConnection {
                     try {
                         conn.queueOutgoing(new Error(m, new DBus.Error.UnknownMethod("Failure in de-serializing message: " + e)));
                     }
-                    catch ( DBusException DBe ) {}
+                    catch ( DBusException DBe ) {
+                        log.debug("Failure queuing error", DBe);
+                    }
                     return;
                 }
 
@@ -997,7 +999,9 @@ public abstract class AbstractConnection {
                     try {
                         conn.queueOutgoing(new Error(m, DBEe));
                     }
-                    catch ( DBusException DBe ) {}
+                    catch ( DBusException DBe ) {
+                        log.debug("Failure queuing error", DBe);
+                    }
                 }
                 catch ( Throwable e ) {
                     log.warn("Failed to call method", e);
@@ -1008,7 +1012,9 @@ public abstract class AbstractConnection {
                             m.getName(),
                             e.getMessage()))));
                     }
-                    catch ( DBusException DBe ) {}
+                    catch ( DBusException DBe ) {
+                        log.debug("Failure queuing error", DBe);
+                    }
                 }
             }
         });
@@ -1069,7 +1075,9 @@ public abstract class AbstractConnection {
                             conn.queueOutgoing(new Error(s, new DBusExecutionException("Error handling signal " + s.getInterface() + "."
                                     + s.getName() + ": " + DBe.getMessage())));
                         }
-                        catch ( DBusException DBe2 ) {}
+                        catch ( DBusException DBe2 ) {
+                            log.debug("Failure queuing error", DBe2);
+                        }
                     }
                 }
             });
@@ -1211,7 +1219,9 @@ public abstract class AbstractConnection {
             try {
                 queueOutgoing(new Error(mr, new DBusExecutionException("Spurious reply. No message with the given serial id was awaiting a reply.")));
             }
-            catch ( DBusException DBe ) {}
+            catch ( DBusException DBe ) {
+                log.debug("Failure queuing error", DBe);
+            }
     }
 
 
@@ -1255,18 +1265,24 @@ public abstract class AbstractConnection {
                             "Disconnected"
                         }));
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failed to set reply", DBe);
+                }
             if ( m instanceof MethodCall && e instanceof DBusExecutionException )
                 try {
                     ( (MethodCall) m ).setReply(new Error(m, e));
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failed to set reply", DBe);
+                }
             else if ( m instanceof MethodCall )
                 try {
                     log.info("Setting reply to " + m + " as an error");
                     ( (MethodCall) m ).setReply(new Error(m, new DBusExecutionException("Message Failed to Send: " + e.getMessage())));
                 }
-                catch ( DBusException DBe ) {}
+                catch ( DBusException DBe ) {
+                    log.debug("Failed to set reply", DBe);
+                }
             else if ( m instanceof MethodReturn )
                 try {
                     this.transport.mout.writeMessage(new Error(m, e));
@@ -1291,7 +1307,7 @@ public abstract class AbstractConnection {
             m = this.transport.min.readMessage();
         }
         catch ( IOException IOe ) {
-            throw new FatalDBusException(IOe.getMessage());
+            throw new FatalDBusException(IOe.getMessage(), IOe);
         }
         return m;
     }
@@ -1312,7 +1328,9 @@ public abstract class AbstractConnection {
             try {
                 return userCL.loadClass(className);
             }
-            catch ( ClassNotFoundException e ) {}
+            catch ( ClassNotFoundException e ) {
+                log.debug("Class not found " + className, e);
+            }
         }
 
         return this.getClass().getClassLoader().loadClass(className);

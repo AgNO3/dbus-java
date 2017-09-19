@@ -17,4 +17,30 @@ public class MarshallingException extends DBusException implements NonFatalExcep
     public MarshallingException ( String message ) {
         super(message);
     }
+
+
+    /**
+     * 
+     */
+    public MarshallingException () {
+        super();
+    }
+
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public MarshallingException ( String message, Throwable cause ) {
+        super(message, cause);
+    }
+
+
+    /**
+     * @param cause
+     */
+    public MarshallingException ( Throwable cause ) {
+        super(cause);
+    }
+
 }

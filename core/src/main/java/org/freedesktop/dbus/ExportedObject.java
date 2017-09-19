@@ -24,12 +24,16 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.freedesktop.dbus.exceptions.DBusExecutionException;
 import org.freedesktop.dbus.types.Tuple;
 
 
 class ExportedObject {
+
+    private static final Logger log = Logger.getLogger(ExportedObject.class);
+
 
     private static String getAnnotations ( AnnotatedElement c ) {
         String ans = "";
@@ -40,9 +44,12 @@ class ExportedObject {
                 Method m = t.getMethod("value");
                 value = m.invoke(a).toString();
             }
-            catch ( NoSuchMethodException NSMe ) {}
-            catch ( InvocationTargetException ITe ) {}
-            catch ( IllegalAccessException IAe ) {}
+            catch (
+                NoSuchMethodException |
+                InvocationTargetException |
+                IllegalAccessException e ) {
+                log.debug("Error getting annotations", e);
+            }
 
             ans += "  <annotation name=\"" + AbstractConnection.dollar_pattern.matcher(t.getName()).replaceAll(".") + "\" value=\"" + value
                     + "\" />\n";

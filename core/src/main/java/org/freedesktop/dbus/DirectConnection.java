@@ -62,12 +62,10 @@ public class DirectConnection extends AbstractConnection {
             this.connected = true;
         }
         catch ( IOException IOe ) {
-            log.warn(IOe);
-            throw new DBusException("Failed to connect to bus " + IOe.getMessage());
+            throw new DBusException("Failed to connect to bus " + IOe.getMessage(), IOe);
         }
         catch ( ParseException Pe ) {
-            log.warn(Pe);
-            throw new DBusException("Failed to connect to bus " + Pe.getMessage());
+            throw new DBusException("Failed to connect to bus " + Pe.getMessage(), Pe);
         }
 
         listen();
@@ -87,6 +85,7 @@ public class DirectConnection extends AbstractConnection {
             port = s.getLocalPort();
         }
         catch ( Exception e ) {
+            log.debug("Bind failed, retry with random port", e);
             port = 32768 + ( Math.abs(RANDOM.nextInt()) % 28232 );
         }
         address += ",port=" + port;
@@ -144,7 +143,9 @@ public class DirectConnection extends AbstractConnection {
                         ifcs.add(this.loadClass(iface));
                         break;
                     }
-                    catch ( Exception e ) {}
+                    catch ( Exception e ) {
+                        log.debug("Failed to load proxy class", e);
+                    }
                     j = iface.lastIndexOf(".");
                     char[] cs = iface.toCharArray();
                     if ( j >= 0 ) {
@@ -155,7 +156,7 @@ public class DirectConnection extends AbstractConnection {
             }
 
             if ( ifcs.size() == 0 )
-                throw new DBusException("Could not find an interface to cast to");
+                throw new DBusException(String.format("Could not find an interface to cast to in [%s]", ifaces));
 
             RemoteObject ro = new RemoteObject(null, path, null, false);
             DBusInterface newi = (DBusInterface) Proxy.newProxyInstance(
@@ -166,8 +167,7 @@ public class DirectConnection extends AbstractConnection {
             return newi;
         }
         catch ( Exception e ) {
-            log.warn(e);
-            throw new DBusException(String.format("Failed to create proxy object for %s; reason: %s.", path, e.getMessage()));
+            throw new DBusException(String.format("Failed to create proxy object for %s; reason: %s.", path, e.getMessage()), e);
         }
     }
 

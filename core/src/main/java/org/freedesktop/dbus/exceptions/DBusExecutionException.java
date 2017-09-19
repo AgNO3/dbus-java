@@ -17,6 +17,30 @@ package org.freedesktop.dbus.exceptions;
 @SuppressWarnings ( "serial" )
 public class DBusExecutionException extends RuntimeException {
 
+    /**
+     * 
+     */
+    public DBusExecutionException () {
+        super();
+    }
+
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public DBusExecutionException ( String message, Throwable cause ) {
+        super(message, cause);
+    }
+
+
+    /**
+     * @param cause
+     */
+    public DBusExecutionException ( Throwable cause ) {
+        super(cause);
+    }
+
     private String type;
 
 

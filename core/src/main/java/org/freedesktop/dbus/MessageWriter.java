@@ -30,11 +30,7 @@ public class MessageWriter {
     public MessageWriter ( OutputStream out ) {
         this.out = out;
         this.isunix = false;
-        // try {
-        // if ( out instanceof USOutputStream )
-        // this.isunix = true;
-        // }
-        // catch ( Throwable t ) {}
+
         if ( !this.isunix )
             this.out = new BufferedOutputStream(this.out);
     }
@@ -49,19 +45,7 @@ public class MessageWriter {
             log.warn("Message " + m + " wire-data was null!");
             return;
         }
-        // if ( this.isunix ) {
-        // if ( log.isDebugEnabled() ) {
-        // log.debug("Writing all " + m.getWireData().length + " buffers simultaneously to Unix Socket");
-        //
-        // if ( log.isTraceEnabled() ) {
-        // Hex h = new Hex();
-        // for ( byte[] buf : m.getWireData() )
-        // log.trace("(" + buf + "):" + ( null == buf ? "" : h.encode(buf) ));
-        // }
-        // }
-        // ( (USOutputStream) this.out ).write(m.getWireData());
-        // }
-        // else
+
         for ( byte[] buf : m.getWireData() ) {
             if ( log.isTraceEnabled() ) {
                 Hex h = new Hex();
@@ -76,7 +60,7 @@ public class MessageWriter {
 
 
     public void close () throws IOException {
-        log.info("Closing Message Writer");
+        log.debug("Closing Message Writer");
         this.out.close();
     }
 }

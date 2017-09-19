@@ -60,6 +60,7 @@ public class DBusAsyncReply <ReturnType> {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     private synchronized void checkReply () {
         if ( this.mc.hasReply() ) {
             Message m = this.mc.getReply();
@@ -73,8 +74,8 @@ public class DBusAsyncReply <ReturnType> {
                     this.error = DBEe;
                 }
                 catch ( DBusException DBe ) {
-                    log.warn(DBe);
-                    this.error = new DBusExecutionException(DBe.getMessage());
+                    log.warn("Failed to get return value", DBe);
+                    this.error = new DBusExecutionException(DBe.getMessage(), DBe);
                 }
             }
         }

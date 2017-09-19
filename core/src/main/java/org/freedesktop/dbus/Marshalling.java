@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.freedesktop.dbus.DBus.Error.UnknownObject;
 import org.freedesktop.dbus.exceptions.DBusException;
+import org.freedesktop.dbus.exceptions.DBusExecutionException;
 import org.freedesktop.dbus.types.DBusListType;
 import org.freedesktop.dbus.types.DBusMap;
 import org.freedesktop.dbus.types.DBusMapType;
@@ -414,8 +416,7 @@ public class Marshalling {
             return i;
         }
         catch ( IndexOutOfBoundsException IOOBe ) {
-            log.warn("", IOOBe);
-            throw new DBusException("Failed to parse DBus type signature: " + dbus);
+            throw new DBusException("Failed to parse DBus type signature: " + dbus, IOOBe);
         }
         catch ( DBusException e ) {
             log.warn("Failed to determine object type:", e);
@@ -521,10 +522,23 @@ public class Marshalling {
 
         // its an object path, get/create the proxy
         if ( tmpParam instanceof ObjectPath ) {
-            if ( tmpType instanceof Class && DBusInterface.class.isAssignableFrom((Class<?>) tmpType) )
-                tmpParam = conn.getExportedObject( ( (ObjectPath) tmpParam ).source, ( (ObjectPath) tmpParam ).path);
-            else
+            if ( tmpType instanceof Class && DBusInterface.class.isAssignableFrom((Class<?>) tmpType) ) {
+                // methods may return path references that are already gone when dereferencing them
+                try {
+                    tmpParam = conn.getExportedObject( ( (ObjectPath) tmpParam ).source, ( (ObjectPath) tmpParam ).path);
+                }
+                catch ( UnknownObject e ) {
+                    log.debug("Returned object does not/no longer exist " + ( (ObjectPath) tmpParam ).path, e);
+                    return null;
+                }
+                catch ( DBusExecutionException e ) {
+                    log.warn("Failure fetching returned reference " + ( (ObjectPath) tmpParam ).path, e);
+                    return null;
+                }
+            }
+            else {
                 tmpParam = new Path( ( (ObjectPath) tmpParam ).path);
+            }
         }
 
         // it should be a struct. create it
@@ -552,7 +566,9 @@ public class Marshalling {
                     tmpParam = con.newInstance((Object[]) tmpParam);
                     break;
                 }
-                catch ( IllegalArgumentException IAe ) {}
+                catch ( IllegalArgumentException IAe ) {
+                    log.debug("Failure creating struct", IAe);
+                }
             }
         }
 
@@ -690,11 +706,10 @@ public class Marshalling {
                             tmpParams = compress;
                         }
                         catch ( ArrayIndexOutOfBoundsException AIOOBe ) {
-                            log.warn(AIOOBe);
                             throw new DBusException(String.format(
                                 "Not enough elements to create custom object from serialized data ({0} < {1}).",
                                 tmpParams.length - i,
-                                newtypes.length));
+                                newtypes.length), AIOOBe);
                         }
                     }
             }

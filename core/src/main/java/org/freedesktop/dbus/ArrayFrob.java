@@ -47,6 +47,7 @@ class ArrayFrob {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     public static <T> T[] wrap ( Object o ) throws IllegalArgumentException {
         Class<? extends Object> ac = o.getClass();
         if ( !ac.isArray() )
@@ -62,6 +63,7 @@ class ArrayFrob {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     public static <T> Object unwrap ( T[] ns ) throws IllegalArgumentException {
         Class<? extends T[]> ac = (Class<? extends T[]>) ns.getClass();
         Class<T> cc = (Class<T>) ac.getComponentType();
@@ -93,6 +95,7 @@ class ArrayFrob {
     }
 
 
+    @SuppressWarnings ( "unchecked" )
     public static <T> T[] delist ( List<T> l, Class<T> c ) throws IllegalArgumentException {
         return l.toArray((T[]) Array.newInstance(c, 0));
     }

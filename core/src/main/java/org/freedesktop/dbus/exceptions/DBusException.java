@@ -23,4 +23,30 @@ public class DBusException extends Exception {
     public DBusException ( String message ) {
         super(message);
     }
+
+
+    /**
+     * 
+     */
+    public DBusException () {
+        super();
+    }
+
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public DBusException ( String message, Throwable cause ) {
+        super(message, cause);
+    }
+
+
+    /**
+     * @param cause
+     */
+    public DBusException ( Throwable cause ) {
+        super(cause);
+    }
+
 }

@@ -160,6 +160,7 @@ public class TestCase {
         }
 
 
+        @SuppressWarnings ( "unchecked" )
         @Override
         public <T> T dostuff ( TestStruct foo ) {
             System.out.println("Doing Stuff " + foo);
@@ -357,6 +358,7 @@ public class TestCase {
         }
 
 
+        @SuppressWarnings ( "unchecked" )
         @Override
         public void complexv ( Variant<? extends Object> v ) {
             if ( !"a{ss}".equals(v.getSig()) || ! ( v.getValue() instanceof Map ) || ( (Map<Object, Object>) v.getValue() ).size() != 1
@@ -688,6 +690,7 @@ public class TestCase {
             fail("show return value incorrect (" + rv.a + "," + rv.b + "," + rv.c + ")");
 
         System.out.println("Doing stuff asynchronously");
+        @SuppressWarnings ( "unchecked" )
         DBusAsyncReply<Boolean> stuffreply = (DBusAsyncReply<Boolean>) clientconn.callMethodAsync(tri2, "dostuff", new TestStruct("bar", new UInt32(
             52), new Variant<>(new Boolean(true))));
 

@@ -87,6 +87,7 @@ public class MessageReader {
                 rv = this.in.read(this.tbuf, this.len[ 1 ], 4 - this.len[ 1 ]);
             }
             catch ( SocketTimeoutException STe ) {
+                log.debug("Socket timeout", STe);
                 return null;
             }
             if ( -1 == rv )
@@ -121,6 +122,7 @@ public class MessageReader {
                 rv = this.in.read(this.header, 8 + this.len[ 2 ], headerlen - this.len[ 2 ]);
             }
             catch ( SocketTimeoutException STe ) {
+                log.debug("Socket timeout", STe);
                 return null;
             }
             if ( -1 == rv )
@@ -147,6 +149,7 @@ public class MessageReader {
                 rv = this.in.read(this.body, this.len[ 3 ], this.body.length - this.len[ 3 ]);
             }
             catch ( SocketTimeoutException STe ) {
+                log.debug("Socket timeout", STe);
                 return null;
             }
             if ( -1 == rv )
@@ -188,7 +191,6 @@ public class MessageReader {
             m.populate(this.buf, this.header, this.body);
         }
         catch ( DBusException DBe ) {
-            log.warn(DBe);
             this.buf = null;
             this.tbuf = null;
             this.body = null;
@@ -196,7 +198,6 @@ public class MessageReader {
             throw DBe;
         }
         catch ( RuntimeException Re ) {
-            log.warn(Re);
             this.buf = null;
             this.tbuf = null;
             this.body = null;
