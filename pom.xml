@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>java-dbus</artifactId>
+	<artifactId>dbus-java</artifactId>
 	<groupId>eu.agno3</groupId>
 	<version>3.11-SNAPSHOT</version>
 
@@ -30,9 +30,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/AgNO3/java-dbus.git</connection>
-		<developerConnection>scm:git:https://github.com/AgNO3/java-dbus.git</developerConnection>
-		<url>git@github.com:AgNO3/java-dbus.git</url>
+		<connection>scm:git:https://github.com/AgNO3/dbus-java.git</connection>
+		<developerConnection>scm:git:https://github.com/AgNO3/dbus-java.git</developerConnection>
+		<url>git@github.com:AgNO3/dbus-java.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
