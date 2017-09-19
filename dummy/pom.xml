@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.agno3</groupId>
+		<artifactId>java-dbus</artifactId>
+		<version>3.11-SNAPSHOT</version>
+	</parent>
+	<artifactId>java-dbus-dummy</artifactId>
+
+	<packaging>pom</packaging>
+	<name>Deploy Dummy</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>eu.agno3</groupId>
+			<artifactId>java-dbus-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.agno3</groupId>
+			<artifactId>java-dbus-apps</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
+
+	<modules>
+	</modules>
+</project>
