@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.agno3</groupId>
 		<artifactId>java-dbus</artifactId>
-		<version>3.10-SNAPSHOT</version>
+		<version>3.11-SNAPSHOT</version>
 	</parent>
 	<artifactId>java-dbus-apps</artifactId>
 
